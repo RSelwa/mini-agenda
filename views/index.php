@@ -19,18 +19,6 @@ $week  = (int)date('W', $date);
 if((string)date('l', $date)!=="Monday")$week+=1;
 ?>
 
-<!doctype html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
-
-    <title>Mini Galerie</title>
-</head>
-<body>
 <nav class="d-flex align-items-center justify-content-between px-5 py-3 bg-primary text-light">
 <h5 class="fw-normal">Planning de patates</h5>
 <div  class="d-flex align-items-center">
@@ -51,8 +39,7 @@ if((string)date('l', $date)!=="Monday")$week+=1;
            echo 'selected="selected"';
         } ?> >2020</option>
     </select>
-    <!-- <input type="submit" value="GO"> -->
-    <!-- </form> -->
+
 </h1>
 </div>
 
@@ -61,24 +48,43 @@ if((string)date('l', $date)!=="Monday")$week+=1;
 <div class="row">
 <?php
 
-
-for ($i=$week; $i <= 53; $i++) { 
+// for ($i=$week; $i <= 53; $i++) { 
+    foreach($mongoSemaines->getAll(['year'=>$year],[]) as $r){
+        // print_r($r->week);
+      if ($r->idPersonne == "") {
+        $r->idPersonne = "Personne";
+      }
     $date = new DateTime();
-    $date->setISODate($departYear,$i);
+    $date->setISODate($departYear,$r->week);
     // echo $date->format('l'); 
     echo "<div class='semaine d-flex justify-content-around flex-row flex-wrap border py-2  col-md-3 col-6 '>";
     echo "<div class='semaine-date py-2 '>";
     echo $date->format('d/m/y');
     echo "</div>";
     echo "<div class='semaine-select py-2'>";
-    echo '<select id="',$date->format('d/m/y'),'" name="names">
-    <option value="personne">personne</option>
-    <option value="vincent">vincent</option>
-    <option value="david">david</option>
-    <option value="christophe">christophe</option></select>';
+    echo "<div class=' px-3 rounded shadow py-1 bg-light'>",$r->idPersonne,"</div>";
     echo "</div>";
     echo "</div>";
     }
+?>
+<?php
+// for ($i=$week; $i <= 53; $i++) { 
+//     $date = new DateTime();
+//     $date->setISODate($departYear,$i);
+//     // echo $date->format('l'); 
+//     echo "<div class='semaine d-flex justify-content-around flex-row flex-wrap border py-2  col-md-3 col-6 '>";
+//     echo "<div class='semaine-date py-2 '>";
+//     echo $date->format('d/m/y');
+//     echo "</div>";
+//     echo "<div class='semaine-select py-2'>";
+//     echo '<select id="',$date->format('d/m/y'),'" name="names">
+//     <option value="personne">personne</option>
+//     <option value="vincent">vincent</option>
+//     <option value="david">david</option>
+//     <option value="christophe">christophe</option></select>';
+//     echo "</div>";
+//     echo "</div>";
+//     }
 ?>
 </div>
 

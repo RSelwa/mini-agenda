@@ -1,82 +1,103 @@
 <?php
-
-$public = "public/uploads/";
-
-
-$files = $_FILES["files"];
-for ($i = 0; $i < count($files["tmp_name"]); $i++) {
-    $name = $public . uniqid() . "-" . str_replace(" ", "-", basename($files["name"][$i]));
-    $imageData = file_get_contents($files["tmp_name"][$i]);
-    echo sprintf('<img src="data:' . $files["type"][$i] . ';base64,%s" />', base64_encode($imageData));
-    move_uploaded_file($files["tmp_name"][$i], $name);
+date_default_timezone_set('UTC');
+$departDay = 1;
+$departMonth = 1;
+switch (substr($_SERVER['REQUEST_URI'], -4)) {
+    case "2020":
+        $departYear = 2020;
+        break;
+    case "2019":
+        $departYear = 2019;
+        break;
+    
+    default:
+        $departYear = 2019;
+        break;
 }
+$date  = mktime(0, 0, 0, $departMonth, $departDay, $departYear);
+$week  = (int)date('W', $date);
+if((string)date('l', $date)!=="Monday")$week+=1;
 ?>
 
-<!doctype html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <!--    <script src="../public/js/dropzone.min.js"></script>-->
-    <!--    <link rel="stylesheet" href="../public/css/dropzone.min.css">-->
-    <!--    <link rel="stylesheet" href="../public/css/basic.min.css">-->
-    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
-    <title>Utilisateur</title>
-</head>
-<body class="min-h-screen">
-<nav>
-    <ul class="flex items-center justify-center gap-4 uppercase">
-        <li>
-            <a href="#">Se connecter</a>
-        </li>
-        <li>
-            <a href="#">Se déconnecter</a>
-        </li>
-    </ul>
+<nav class="d-flex align-items-center justify-content-between px-5 py-3 bg-primary text-light">
+<h5 class="fw-normal">Planning de patates</h5>
+<div  class="d-flex align-items-center">
+    <div class="px-3 py-1 bg-red rounded border border-2 border-dark bg-dark mx-3 shadow "> <a href="" class="text-reset text-decoration-none"> SE CONNECTER</a> </div>
+    <div class="px-3 py-1 bg-red rounded border border-2 border-white mx-3  "><a href="" class="text-reset text-decoration-none"  > S'INSCRIRE</a></div>
+</div>
 </nav>
-<main>
-    <div class="container p-8 mx-auto">
-        <h1 class="text-center text-6xl font-bold uppercase">Galeries</h1>
-        <button
-                class="btn-new-gallery mt-4 mx-auto block px-6 py-2 text-xs font-medium leading-6 text-center text-white uppercase transition bg-black rounded-full shadow ripple waves-light hover:shadow-lg focus:outline-none hover:bg-black">
-            Créer une nouvelle
-        </button>
-        <?php foreach ($galleries as $gallery): ?>
-            <div class="gallery">
-                <h1><?= $gallery->name ?></h1>
-                <div class="photos">
-                    <?php foreach ($gallery->images as $image): ?>
-                        <img src="<?= $image->src ?>"
-                             alt="<?= isset($image->alt) ? $image->alt : "Galerie de l'utilisateur" ?>">
-                    <?php endforeach; ?>
-                </div>
-            </div>
-        <?php endforeach; ?>
+<div class="d-flex justify-content-center p-3">
+<h1>    
+    Année
+    <!-- <form action="" method="get"> -->
+    <select id="year-select" name="year" >
+    <option value="2019"<?php if (substr($_SERVER['REQUEST_URI'], -4) == 2019) {
+       echo 'selected="selected"';
+    } ?>  >2019</option>
+        <option value="2020" <?php if (substr($_SERVER['REQUEST_URI'], -4)== 2020) {
+          
+           echo 'selected="selected"';
+        } ?> >2020</option>
+    </select>
+
+</h1>
+</div>
+
+  <div class="planning-container container d-flex justify-content-center flex-row flex-wrap mx-5 my-3">
+  
+<div class="row">
+<?php
+
+// for ($i=$week; $i <= 53; $i++) { 
+    foreach($mongoSemaines->getAll(['year'=>$year],[]) as $r){
+        // print_r($r->week);
+      
+    $date = new DateTime();
+    $date->setISODate($departYear,$r->week);
+    // echo $date->format('l'); 
+    echo "<div class='semaine d-flex justify-content-around flex-row flex-wrap border py-2  col-md-3 col-6 '>";
+    echo "<div class='semaine-date py-2 '>";
+    echo $date->format('d/m/y');
+    echo "</div>";
+    echo "<div class='semaine-select py-2'>";
+    echo '<select id="',$date->format('d/m/y'),'" name="names">';
+    echo "<option value=''>Personne</option>";
+    foreach($mongoUsers->getAll([],[]) as $r){
+    echo "<option value=",$r->name,">",$r->name,"</option>";
+   
+    // <option value="personne">personne</option>
+    // <option value="vincent">vincent</option>
+    // <option value="david">david</option>
+    // <option value="christophe">christophe</option>
+}
+    echo "</select>";
+    echo "</div>";
+    echo "</div>";
+    }
+?>
+<?php
+// for ($i=$week; $i <= 53; $i++) { 
+//     $date = new DateTime();
+//     $date->setISODate($departYear,$i);
+//     // echo $date->format('l'); 
+//     echo "<div class='semaine d-flex justify-content-around flex-row flex-wrap border py-2  col-md-3 col-6 '>";
+//     echo "<div class='semaine-date py-2 '>";
+//     echo $date->format('d/m/y');
+//     echo "</div>";
+//     echo "<div class='semaine-select py-2'>";
+//     echo '<select id="',$date->format('d/m/y'),'" name="names">
+//     <option value="personne">personne</option>
+//     <option value="vincent">vincent</option>
+//     <option value="david">david</option>
+//     <option value="christophe">christophe</option></select>';
+//     echo "</div>";
+//     echo "</div>";
+//     }
+?>
+</div>
 
 
-        <div class="create-new-gallery fixed bottom-0 right-0 mr-8 mb-12 w-4/5 md:w-96 hidden">
-            <form method="post" action="" enctype="multipart/form-data"
-                  class="dropzone flex flex-col gap-2 bg-white rounded-lg shadow-md px-4 py-2 border-1 border-gray-400">
-                <label for="name">Nom de la galerie</label>
-                <input type="text" name="name" id="name" class="border rounded-sm px-1" value="Test">
-                <label for="desc">Description de la galerie</label>
-                <textarea
-                        name="description"
-                        id="desc"
-                        cols="30"
-                        rows="4"
-                        class="border rounded-sm px-1"
-                >Test de description</textarea>
-                <input name="files[]" type="file" multiple/>
-                <button type="submit" class="bg-black text-white font-bold justify-center rounded-sm flex py-1">Créer ma
-                    galerie
-                </button>
-            </form>
-        </div>
-    </div>
-</main>
-<script src="../public/js/app.js"></script>
-</body>
-</html>
+
+
+
+  </div>

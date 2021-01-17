@@ -1,6 +1,9 @@
 <?php
 
 class User extends MongoModel {
+    private $mongoSemaines;
+    private $mongoUsers;
+
     public function __construct(){
         //test si $_session existe
     }
@@ -17,7 +20,8 @@ public function modifyAgenda($db){
 public function render($mongoSemaines,$mongoUsers){
     $this->mongoSemaines = $mongoSemaines;
     $this->mongoUsers = $mongoUsers;
-    $year = 2020;
+    $year = 2019;
+
     include('views/user.php');
 }
 }

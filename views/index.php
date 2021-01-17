@@ -1,20 +1,12 @@
 <?php
 date_default_timezone_set('UTC');
+if (isset($_POST['year'])) {
+    $year = (int)$_POST['year'];
+}
 $departDay = 1;
 $departMonth = 1;
-switch (substr($_SERVER['REQUEST_URI'], -4)) {
-    case "2020":
-        $departYear = 2020;
-        break;
-    case "2019":
-        $departYear = 2019;
-        break;
-    
-    default:
-        $departYear = 2019;
-        break;
-}
-$date  = mktime(0, 0, 0, $departMonth, $departDay, $departYear);
+
+$date  = mktime(0, 0, 0, $departMonth, $departDay, $year);
 $week  = (int)date('W', $date);
 if((string)date('l', $date)!=="Monday")$week+=1;
 ?>
@@ -29,17 +21,18 @@ if((string)date('l', $date)!=="Monday")$week+=1;
 <div class="d-flex justify-content-center p-3">
 <h1>    
     Année
-    <!-- <form action="" method="get"> -->
+    <form action="" method="post">
     <select id="year-select" name="year" >
-    <option value="2019"<?php if (substr($_SERVER['REQUEST_URI'], -4) == 2019) {
+    <option value="2019"<?php if ($year == 2019) {
        echo 'selected="selected"';
     } ?>  >2019</option>
-        <option value="2020" <?php if (substr($_SERVER['REQUEST_URI'], -4)== 2020) {
+        <option value="2020" <?php if ($year == 2020) {
           
            echo 'selected="selected"';
         } ?> >2020</option>
     </select>
-
+    <button type="submit">Submit</button>
+</form>
 </h1>
 </div>
 
@@ -48,15 +41,12 @@ if((string)date('l', $date)!=="Monday")$week+=1;
 <div class="row">
 <?php
 
-// for ($i=$week; $i <= 53; $i++) { 
     foreach($mongoSemaines->getAll(['year'=>$year],[]) as $r){
-        // print_r($r->week);
       if ($r->idPersonne == "") {
         $r->idPersonne = "Personne";
       }
     $date = new DateTime();
-    $date->setISODate($departYear,$r->week);
-    // echo $date->format('l'); 
+    $date->setISODate($year,$r->week);
     echo "<div class='semaine d-flex justify-content-around flex-row flex-wrap border py-2  col-md-3 col-6 '>";
     echo "<div class='semaine-date py-2 '>";
     echo $date->format('d/m/y');
